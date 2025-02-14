@@ -2,63 +2,60 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import BackgroundImage from "../components/BackgroundImage";
 import Header from "../components/Header";
-import { createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import { firebaseAuth } from "../utils/firebase-config";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-    const [showPassword, setShowPassword] = useState(false)
-    const [formValues,setFormValues]=useState({
-        email:"",
-        password:"",
-    })
+  const [formValues, setFormValues] = useState({
+    email: "",
+    password: "",
+  })
 
-    const navigate=useNavigate()
+  const navigate = useNavigate()
 
-    const handleSignIn=async () => {
-        try{
-            const {email,password}=formValues;
-            await createUserWithEmailAndPassword(firebaseAuth,email,password)
-        }catch(err){
-            console.log(err)
-        }
+  const handleLogIn = async () => {
+    try {
+      const { email, password } = formValues;
+      await signInWithEmailAndPassword(firebaseAuth, email, password)
+    } catch (err) {
+      console.log(err)
     }
+  }
 
-    onAuthStateChanged(firebaseAuth,(currentUser)=>{
-        if(currentUser) navigate("/")
-    })
+  onAuthStateChanged(firebaseAuth, (currentUser) => {
+    if (currentUser) navigate("/")
+  })
 
   return (
-    <Container showPassword={showPassword}>
+    <Container>
       <BackgroundImage />
       <div className="content">
-        <Header login />
-        <div className="body flex column a-center j-center">
-          <div className="text flex column">
-            <h1>Unlimited Movies , TV shows and more</h1>
-            <h4>Watch anywhere. Cancel anytime</h4>
-            <h6>
-              Ready to watch ? Enter your email to create or restart membership
-            </h6>
+        <Header />
+        <div className="form-container flex column a-center j-center">
+          <div className="form flex column a-center j-center">
+            <div className="title">
+              <h3>Login</h3>
+            </div>
+            <div className="container flex column">
+              <input type="email" name="email"
+                onChange={(e) => setFormValues({
+                  ...formValues,
+                  [e.target.name]: e.target.value
+                })}
+                value={formValues.email}
+                placeholder="Email Address" />
+
+              <input type="password" placeholder="Password" name="password"
+                onChange={(e) => setFormValues({
+                  ...formValues,
+                  [e.target.name]: e.target.value
+                })}
+                value={formValues.password}
+              />
+              <button onClick={handleLogIn}>Log In</button>
+            </div>
           </div>
-          <div className="form">
-            <input type="email" name="email" 
-            onChange={(e)=>setFormValues({
-                ...formValues,
-                [e.target.name]:e.target.value
-            })}
-            value={formValues.email}
-            placeholder="Email Address" />
-            {showPassword && ( <input type="password" placeholder="Password" name="password"
-            onChange={(e)=>setFormValues({
-                ...formValues,
-                [e.target.name]:e.target.value
-            })}
-            value={formValues.password}
-            />)}
-            {!showPassword &&  <button onClick={()=>setShowPassword(true)}>Get Started</button>}
-          </div>
-          <button onClick={handleSignIn}>Sign Up</button>
         </div>
       </div>
     </Container>
@@ -76,42 +73,23 @@ const Container = styled.div`
     width: 100vw;
     display: grid;
     grid-template-rows: 15vh 85vh;
-    .body {
-      gap: 1rem;
-      .text {
-        gap: 1rem;
-        text-align: center;
-        font-size: 2rem;
-        h1 {
-          padding: 0 25rem;
-        }
+    .form-container{
+      gap:2rem;
+      height:85vh;
+      .form{
+      padding:2rem;
+      background-color:#000000b0;
+      width:25vw;
+      gap:2rem;
+      color:white;
+      .container{
+      gap:2rem;
+      input{
+      padding:0.5rem 1rem;
+      width:15rem;
       }
-      .form {
-        display: grid;
-        grid-template-columns:${({showPassword})=>showPassword ? "1fr 1fr" : "2fr 1fr"};
-        width: 60%;
-        input {
-          color: black;
-          border: none;
-          padding: 1.5rem;
-          font-size: 1.2rem;
-          border: 1px solid black;
-          &:focus {
-            outline: none;
-          }
-        }
-        button {
-          padding: 0.5rem 1rem;
-          background-color: #e50914;
-          border: none;
-          cursor: pointer;
-          font-size: 1.05rem;
-          color: white;
-          font-weight: bolder;
-        }
-      }
-      button {
-        padding: 0.5rem 1rem;
+      button{
+      padding: 0.5rem 1rem;
         background-color: #e50914;
         border: none;
         cursor: pointer;
@@ -120,6 +98,8 @@ const Container = styled.div`
         color: white;
         font-weight: bolder;
       }
-    }
+        }
+        }
+      }
   }
 `;
