@@ -6,25 +6,32 @@ import { FaPlay } from 'react-icons/fa'
 import {AiOutlineInfoCircle} from "react-icons/ai"
 import styled from 'styled-components'
 import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import { getGenres } from '../store'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchMovies, getGenres } from '../store'
 
 export default function Netflix() {
-  const navigate=useNavigate()
   const [isScrolled,setIsScrolled]=useState(false)
-
+  const navigate=useNavigate()
   const dispatch=useDispatch();
+  const genresLoaded=useSelector((state)=>state.netflix.genresLoaded)
+  const movies=useSelector((state)=>state.netflix.movies)
 
   useEffect(()=>{
     dispatch(getGenres())
   },[])
 
-
+  useEffect(()=>{
+    if(genresLoaded){
+      dispatch(fetchMovies({type:"all"}))
+    }
+  })
+ 
   window.onscroll=()=>{
     setIsScrolled(window.pageYOffset === 0 ? false : true)
     return ()=> (window.onscroll=null)
   }
 
+  // console.log(movies)
 
   return (
    <Container>
@@ -48,6 +55,7 @@ export default function Netflix() {
   )
 }
 
+
 const Container=styled.div`
   background-color:black;
   .hero{
@@ -56,7 +64,7 @@ const Container=styled.div`
       filter:brightness(60%);
     }
       img{
-        height:60vh;
+        height:100vh;
         width:100vw;
       }
       .container{
@@ -86,7 +94,7 @@ const Container=styled.div`
               opacity:0.8;
             }
             &:nth-of-type(2){
-              background-color:rgba(109,109,110,0.7)
+              background-color:rgba(109,109,110,0.7);
               color:white;
               svg{
                 font-size:1.8rem;
